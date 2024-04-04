@@ -6,11 +6,11 @@ import json
 import os
 import datetime
 
-def save_data(purchased, price, buy_historic, sell_historic, brl_balance_historic):
+def save_data(purchased, price, buy_historic, sell_historic, fiat_balance_historic):
     data = {
         'purchased': purchased,
         'price': price,
-        'brl_balance_historic': brl_balance_historic, 
+        'fiat_balance_historic': fiat_balance_historic, 
         'buy_historic': buy_historic,
         'sell_historic': sell_historic
     }
@@ -21,7 +21,7 @@ def load_data():
     try:
         with open('trading_data.json', 'r') as f:
             data = json.load(f)
-            return data['purchased'], data['price'], data['brl_balance_historic'] ,data['buy_historic'], data['sell_historic']
+            return data['purchased'], data['price'], data['fiat_balance_historic'] ,data['buy_historic'], data['sell_historic']
     except FileNotFoundError:
         return False, None, [], [], []
 
@@ -82,12 +82,12 @@ biggest_price = 0
 lowest_price = 1000000
 buy_historic = []
 sell_historic = []
-brl_balance_historic = []
+fiat_balance_historic = []
 
 
 
 if __name__ == '__main__':
-    purchased, price, brl_balance_historic, buy_historic, sell_historic = load_data()
+    purchased, price, fiat_balance_historic, buy_historic, sell_historic = load_data()
     btc_balance = check_balance('BTC')
         
     while True:
@@ -122,7 +122,7 @@ if __name__ == '__main__':
                     price = price_btc
                     purchased = True
                     buy_historic.append((result, price))
-                    save_data(purchased, price, buy_historic, sell_historic, brl_balance_historic)
+                    save_data(purchased, price, buy_historic, sell_historic, fiat_balance_historic)
                     print("Comprado:", result)
         else: 
             print("Aguardando para vender ( preço de venda esperado -> {} )".format(price * sell_percent))
@@ -132,8 +132,8 @@ if __name__ == '__main__':
                 purchased = False
                 price = current_price
                 sell_historic.append((result, current_price))
-                brl_balance_historic.append(check_balance(currency_type))
-                save_data(purchased, price, buy_historic, sell_historic, brl_balance_historic)
+                fiat_balance_historic.append(check_balance(currency_type))
+                save_data(purchased, price, buy_historic, sell_historic, fiat_balance_historic)
                 print("Vendido:", result)
 
         time.sleep(360)  
