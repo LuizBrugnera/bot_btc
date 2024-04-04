@@ -128,12 +128,13 @@ if __name__ == '__main__':
         print(f"{msg['lowest_price']} {lowest_price}")
         print(f"{msg['current_price']} {current_price}")
         
+        
         if(price):
             trade_price = f"{price:.2f}" if price is not None else msg['undefined']
             if not purchased:
-                print(f"{msg['waiting_to_sell'].format(trade_price)}")
-            else:
                 print(f"{msg['waiting_to_buy'].format(trade_price)}")
+            else:
+                print(f"{msg['waiting_to_sell'].format(trade_price)}")
                 
         if not purchased:
             if price is None or current_price <= price * buy_percent:
