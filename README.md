@@ -29,10 +29,10 @@ pip install python-dotenv
 API_KEY=your_binance_api_key
 API_SECRET=your_binance_api_secret
 BUY_PERCENT=percentage_below_current_price_for_buying
-SELL_PERCENT=percentage_above_purchase_price_for_selling
-CURRENCY_TYPE=your currency type, for example USD or BRL
-`Opitional` LANGUAGE=en or pt --> English or Portuguese -- by default it comes in English
-`Opitional` REFRESH_TIME=in seconds --> by default it comes in 360 seconds
+SELL_PERCENT=percentage_above_purchase_price_for_selling   
+CURRENCY_TYPE=your currency type, for example USD or BRL    
+`Opitional` LANGUAGE=en or pt --> English or Portuguese -- by default it comes in English   
+`Opitional` REFRESH_TIME=in seconds --> by default it comes in 360 seconds    
 
 
 Replace `your_binance_api_key`, `your_binance_api_secret`, `percentage_below_current_price_for_buying`, `percentage_above_purchase_price_for_selling`,`your_currency_type`with your actual API credentials and desired percentage thresholds for buying and selling.
