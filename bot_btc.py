@@ -92,7 +92,9 @@ messages = {
         'lowest_price': "Lowest price:",
         'bought': "Bought:",
         'sold': "Sold:",
-        'undefined': "undefined"
+        'undefined': "undefined",
+        'buy_price': 'Price of last purchase: {}',
+        'sell_price': 'Last sale price: {}'
     },
     'pt': {
         'waiting_to_buy': "Aguardando para comprar (preço de compra esperado -> {})",
@@ -102,7 +104,9 @@ messages = {
         'lowest_price': "Menor preço:",
         'bought': "Comprado:",
         'sold': "Vendido:",
-        'undefined': "indefinido"
+        'undefined': "indefinido",
+        'buy_price': 'Preço da última compra: {}',
+        'sell_price': 'Preço da última venda: {}'
     }
 }
 
@@ -132,9 +136,11 @@ if __name__ == '__main__':
         if(price):
             trade_price = f"{price:.2f}" if price is not None else msg['undefined']
             if not purchased:
-                print(f"{msg['waiting_to_buy'].format(trade_price)}")
+                print(f"{msg['sell_price'].format(trade_price)}")
+                print(f"{msg['waiting_to_buy'].format((price * buy_percent))}")
             else:
-                print(f"{msg['waiting_to_sell'].format(trade_price)}")
+                print(f"{msg['buy_price'].format(trade_price)}")
+                print(f"{msg['waiting_to_sell'].format((price * sell_percent))}")
                 
         if not purchased:
             if price is None or current_price <= price * buy_percent:
