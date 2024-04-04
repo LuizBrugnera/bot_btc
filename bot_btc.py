@@ -36,13 +36,12 @@ def get_lot_size(symbol):
             return float(filt['minQty']), float(filt['stepSize']), len(str(filt['stepSize']).split('.')[-1])
 
 def buy_bitcoin():
-    amount_brl = check_balance(currency_type)  # Verifica o saldo em BRL
+    amount_brl = check_balance(currency_type)  
     btc_price = float(client.get_symbol_ticker(symbol="BTCBRL")['price'])
     btc_amount = amount_brl / btc_price
 
     min_qty, step_size, precision = get_lot_size('BTCBRL')
 
-    # Arredonda a quantidade para atender ao requisito de step size
     btc_amount = round(btc_amount, precision)
 
     btc_amount = max(min_qty, round(btc_amount // step_size * step_size, precision))
@@ -53,7 +52,6 @@ def buy_bitcoin():
 def sell_bitcoin(btc_amount):
     min_qty, step_size, precision = get_lot_size('BTCBRL')
 
-    # Ajusta a quantidade para atender ao requisito de precisão e step size
     btc_amount = max(min_qty, round(btc_amount // step_size * step_size, precision))
 
     order = client.order_market_sell(symbol='BTCBRL', quantity=btc_amount)
@@ -67,12 +65,13 @@ def formatPercent(percent, type):
 
 load_dotenv()
 
-# Acessa as variáveis de ambiente
 api_key = os.getenv('API_KEY')
 api_secret = os.getenv('API_SECRET')
 sell_percent = formatPercent(int(os.getenv('SELL_PERCENT')), 'SELL')
 buy_percent = formatPercent(int(os.getenv('BUY_PERCENT')), 'BUY')
 currency_type = os.getenv('CURRENCY_TYPE')
+language = os.getenv('LANGUAGE', 'en').lower()
+refresh_time = int(os.getenv('REFRESH_TIME', 360))
 
 client = Client(api_key, api_secret)
 
@@ -84,7 +83,28 @@ buy_historic = []
 sell_historic = []
 fiat_balance_historic = []
 
-
+messages = {
+    'en': {
+        'waiting_to_buy': "Waiting to buy (expected buy price -> {})",
+        'waiting_to_sell': "Waiting to sell (expected sell price -> {})",
+        'current_price': "Current price:",
+        'highest_price': "Highest price:",
+        'lowest_price': "Lowest price:",
+        'bought': "Bought:",
+        'sold': "Sold:",
+        'undefined': "undefined"
+    },
+    'pt': {
+        'waiting_to_buy': "Aguardando para comprar (preço de compra esperado -> {})",
+        'waiting_to_sell': "Aguardando para vender (preço de venda esperado -> {})",
+        'current_price': "Preço atual:",
+        'highest_price': "Maior preço:",
+        'lowest_price': "Menor preço:",
+        'bought': "Comprado:",
+        'sold': "Vendido:",
+        'undefined': "indefinido"
+    }
+}
 
 if __name__ == '__main__':
     purchased, price, fiat_balance_historic, buy_historic, sell_historic = load_data()
@@ -92,8 +112,10 @@ if __name__ == '__main__':
         
     while True:
         now = datetime.datetime.now()
+        msg = messages[language] 
         
         print('----' * 5 , now.strftime("%H:%M - %d/%m") , '----' * 5)
+        
         symbol = 'BTC' + currency_type
         current_price = float(client.get_symbol_ticker(symbol=symbol)['price'])
         if(current_price > biggest_price):
@@ -102,30 +124,28 @@ if __name__ == '__main__':
         if(current_price < lowest_price):
             lowest_price = current_price
             
-        print("Maior preço:", biggest_price)
-        print("Menor preço:", lowest_price)
-        print("Preço atual:", current_price)
+        print(f"{msg['highest_price']} {biggest_price}")
+        print(f"{msg['lowest_price']} {lowest_price}")
+        print(f"{msg['current_price']} {current_price}")
         
         if(price):
+            trade_price = f"{price:.2f}" if price is not None else msg['undefined']
             if not purchased:
-                print("Preço de venda:", price)
+                print(f"{msg['waiting_to_sell'].format(trade_price)}")
             else:
-                print("Preço de compra:", price)
+                print(f"{msg['waiting_to_buy'].format(trade_price)}")
                 
-        
         if not purchased:
-            print("Aguardando para comprar ( preço de compra esperado -> {} )".format('indefinido' if price is None else "{:.2f}".format(price * buy_percent)))
             if price is None or current_price <= price * buy_percent:
                 amount_brl = check_balance(currency_type)
-                if amount_brl >= 50:  # Supondo que 50 é o mínimo para comprar
+                if amount_brl >= 5:
                     result, price_btc = buy_bitcoin()
                     price = price_btc
                     purchased = True
                     buy_historic.append((result, price))
                     save_data(purchased, price, buy_historic, sell_historic, fiat_balance_historic)
-                    print("Comprado:", result)
-        else: 
-            print("Aguardando para vender ( preço de venda esperado -> {} )".format(price * sell_percent))
+                    print(f"{msg['bought']} {result}")
+        else:
             if current_price >= price * sell_percent:
                 btc_balance = check_balance('BTC')
                 result = sell_bitcoin(btc_balance)
@@ -134,6 +154,6 @@ if __name__ == '__main__':
                 sell_historic.append((result, current_price))
                 fiat_balance_historic.append(check_balance(currency_type))
                 save_data(purchased, price, buy_historic, sell_historic, fiat_balance_historic)
-                print("Vendido:", result)
+                print(f"{msg['sold']} {result}")
 
-        time.sleep(360)  
+        time.sleep(refresh_time)

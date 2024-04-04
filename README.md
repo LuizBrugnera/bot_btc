@@ -8,6 +8,7 @@ This Python script automates trading operations on the Binance platform. It chec
 - Sells BTC when the price reaches a specified percentage above the purchase price.
 - Saves transaction history and current state to a JSON file to maintain state between executions.
 - Uses environment variables for sensitive information like API keys.
+- Console messages in Portuguese and English
 
 ## Prerequisites
 - Python 3
@@ -30,8 +31,11 @@ API_SECRET=your_binance_api_secret
 BUY_PERCENT=percentage_below_current_price_for_buying
 SELL_PERCENT=percentage_above_purchase_price_for_selling
 CURRENCY_TYPE=your currency type, for example USD or BRL
+`Opitional` LANGUAGE=en or pt --> English or Portuguese -- by default it comes in English
+`Opitional` REFRESH_TIME=in seconds --> by default it comes in 360 seconds
 
-Replace `your_binance_api_key`, `your_binance_api_secret`, `percentage_below_current_price_for_buying`, `percentage_above_purchase_price_for_selling` and `your_currency_type`with your actual API credentials and desired percentage thresholds for buying and selling.
+
+Replace `your_binance_api_key`, `your_binance_api_secret`, `percentage_below_current_price_for_buying`, `percentage_above_purchase_price_for_selling`,`your_currency_type`with your actual API credentials and desired percentage thresholds for buying and selling.
 
 ## How to Run
 1. Navigate to the directory containing the script.
